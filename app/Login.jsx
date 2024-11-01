@@ -164,7 +164,6 @@ function Login() {
                                 style={styles.input}
                             />
                             <TextInput 
-                                secureTextEntry={true} 
                                 value={password} 
                                 onChangeText={setpassword} 
                                 placeholder="Password" 
@@ -172,7 +171,6 @@ function Login() {
                                 style={styles.input}
                             />
                             <TextInput 
-                                secureTextEntry={true} 
                                 value={ifstudent} 
                                 onChangeText={setifstudent} 
                                 placeholder="Student or Staff?" 

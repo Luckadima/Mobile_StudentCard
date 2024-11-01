@@ -272,7 +272,7 @@ const handleLogout = () => {
             saveTimeSpent(timeSpentRef.current);
   
             // Navigate to the login page
-            router.push('/Login');
+            router.push('/Plan');
           }
         }
       ]

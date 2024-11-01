@@ -49,7 +49,7 @@ export default function Homepage() {
     }, []);
 
     const handleReturnHome = () => {
-        if (userRole === 'staff') {
+        if (userRole === 'Staff') {
             router.push('/Stafflanding');
         } else {
             router.push('/Landingpage');
@@ -60,35 +60,50 @@ export default function Homepage() {
         try {
             const auth = getAuth();
             const uid = auth.currentUser?.uid;
-
+    
+            if (!uid) {
+                console.error("No user is logged in.");
+                return null;
+            }
+    
             const response = await fetch(uri);
             const blob = await response.blob();
-
+    
             const storage = getStorage();
-            const storageRef = ref(`storage images/${uid}/profile-image`);
-
+            if (!storage) {
+                console.error("Firebase storage not initialized.");
+                return null;
+            }
+    
+            // Pass both storage and the path to `ref`
+            const storageRef = ref(storage, `storage images/${uid}/profile-image`);
+            
             await uploadBytes(storageRef, blob);
-
+            console.log("Image uploaded to Firebase storage.");
+    
             const downloadUrl = await getDownloadURL(storageRef);
-
+            console.log("Download URL obtained:", downloadUrl);
+    
             await setDoc(doc(db, "users", uid), { imageUrl: downloadUrl }, { merge: true });
-
+            console.log("Image URL saved to Firestore.");
+    
             return downloadUrl;
         } catch (error) {
             console.error("Error uploading image: ", error);
             return null;
         }
     };
+    
 
     const pickImage = async () => {
         const { status: cameraStatus } = await ImagePicker.requestCameraPermissionsAsync();
         const { status: galleryStatus } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-
+    
         if (cameraStatus !== 'granted' || galleryStatus !== 'granted') {
-            alert('Camera and gallery permissions are required.');
+            Alert.alert('Permissions required', 'Camera and gallery permissions are required.');
             return;
         }
-
+    
         Alert.alert(
             'Select Image',
             'Choose an option',
@@ -101,13 +116,9 @@ export default function Homepage() {
                             aspect: [4, 3],
                             quality: 1,
                         });
-
+    
                         if (!result.canceled) {
-                            const imageUrl = await uploadImageToFirebase(result.assets[0].uri);
-                            if (imageUrl) {
-                                setImage(imageUrl);
-                                await AsyncStorage.setItem('image', imageUrl);
-                            }
+                            await handleImageUpdate(result.assets[0].uri);
                         }
                     },
                 },
@@ -120,13 +131,9 @@ export default function Homepage() {
                             aspect: [4, 3],
                             quality: 1,
                         });
-
+    
                         if (!result.canceled) {
-                            const imageUrl = await uploadImageToFirebase(result.assets[0].uri);
-                            if (imageUrl) {
-                                setImage(imageUrl);
-                                await AsyncStorage.setItem('image', imageUrl);
-                            }
+                            await handleImageUpdate(result.assets[0].uri);
                         }
                     },
                 },
@@ -135,6 +142,22 @@ export default function Homepage() {
             { cancelable: true }
         );
     };
+
+    const handleImageUpdate = async (uri) => {
+        try {
+            setImage(null); // Clear current image before updating
+            const imageUrl = await uploadImageToFirebase(uri); // Upload new image
+    
+            if (imageUrl) {
+                setImage(imageUrl); // Set new image URL in state
+                await AsyncStorage.setItem('image', imageUrl); // Update AsyncStorage with new URL
+            }
+        } catch (error) {
+            console.error("Error handling image update: ", error);
+        }
+    };
+    
+    
 
     const [animationStatus, setAnimationStatus] = useState('scanning');
 
@@ -156,7 +179,7 @@ export default function Homepage() {
             }, 4000); 
 
             return () => clearTimeout(resetTimer); 
-        }, 3000); 
+        }, 50000); 
 
         return () => clearTimeout(timer); 
     }, []);

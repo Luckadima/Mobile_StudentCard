@@ -122,7 +122,7 @@ export default function Activity() {
                 const userDoc = await getDoc(userRef); // Retrieve the document for the user
                 if (userDoc.exists()) {
                     const role = userDoc.data().ifstudent; // Assuming 'ifstudent' holds the role
-                    if (role === 'staff') {
+                    if (role === 'Staff') {
                         router.push('/Stafflanding'); // Navigate to Stafflanding if the user is a staff
                     } else {
                         router.push('/Landingpage'); // Navigate to Landingpage otherwise

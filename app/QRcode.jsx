@@ -46,37 +46,40 @@ function QRcode() {
     );
 
     const handleBarcodeScanned = async ({ type, data }) => {
-      setScanned(true);
-      setCooldown(cooldownDuration); // Start cooldown
-      setScanCount(prevCount => prevCount + 1); // Increment the scan counter
-      alert(`Scanned data: ${data}`);
-  
-      const userId = firebase_auth.currentUser?.uid; // Dynamically get the current user's UID
-      if (userId) {
-          try {
-              const userRef = doc(db, 'users', userId);
-              const userDoc = await getDoc(userRef); // Retrieve the document for the user
-  
-              let currentCount = 0; // Default to 0 if no existing document
-              if (userDoc.exists()) {
-                  currentCount = userDoc.data().scanCount || 0; // Get current scan count or default to 0
-              }
-  
-              // Update the scan count in Firestore
-              await setDoc(userRef, { scanCount: currentCount + 1 }, { merge: true });
-              console.log("Scan count updated successfully");
-  
-              // Check if the scanned data matches the expected QR code value
-              if (data === "VirtualCard://Activity") {
-                  router.push('/Activity'); // Redirect to Activity.js
-              }
-          } catch (error) {
-              console.error("Error updating scan count: ", error);
-          }
-      } else {
-          console.error("User not authenticated");
-      }
-  };
+        setScanned(true);
+        setCooldown(cooldownDuration); // Start cooldown
+        setScanCount(prevCount => prevCount + 1); // Increment the scan counter
+    
+        // Display "Access Granted" alert instead of showing scanned data
+        alert("Access granted");
+    
+        const userId = firebase_auth.currentUser?.uid; // Dynamically get the current user's UID
+        if (userId) {
+            try {
+                const userRef = doc(db, 'users', userId);
+                const userDoc = await getDoc(userRef); // Retrieve the document for the user
+    
+                let currentCount = 0; // Default to 0 if no existing document
+                if (userDoc.exists()) {
+                    currentCount = userDoc.data().scanCount || 0; // Get current scan count or default to 0
+                }
+    
+                // Update the scan count in Firestore
+                await setDoc(userRef, { scanCount: currentCount + 1 }, { merge: true });
+                console.log("Scan count updated successfully");
+    
+                // Check if the scanned data matches the expected QR code value
+                if (data === "VirtualCard://Activity") {
+                    router.push('/Activity'); // Redirect to Activity.js
+                }
+            } catch (error) {
+                console.error("Error updating scan count: ", error);
+            }
+        } else {
+            console.error("User not authenticated");
+        }
+    };
+    
   
 
     const goBack = async () => {
@@ -87,7 +90,7 @@ function QRcode() {
                 const userDoc = await getDoc(userRef); // Retrieve the document for the user
                 if (userDoc.exists()) {
                     const role = userDoc.data().ifstudent; // Assuming 'ifstudent' holds the role
-                    if (role === 'staff') {
+                    if (role === 'Staff') {
                         router.push('/Stafflanding'); // Navigate to Stafflanding if the user is a staff
                     } else {
                         router.push('/Landingpage'); // Navigate to Landingpage otherwise

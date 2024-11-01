@@ -65,7 +65,7 @@ function Stafflogin() {
                 const userData = userDoc.data();
                 const isStudent = userData.ifstudent;
     
-                if (isStudent === 'staff') {
+                if (isStudent === 'Staff') {
                     // If the user is a staff member, redirect to Stafflanding
                     router.push('/Stafflanding');
                 } else {
@@ -161,7 +161,6 @@ function Stafflogin() {
                                 style={styles.input}
                             />
                             <TextInput 
-                                secureTextEntry={true} 
                                 value={password} 
                                 onChangeText={setpassword} 
                                 placeholder="Password" 
@@ -169,7 +168,6 @@ function Stafflogin() {
                                 style={styles.input}
                             />
                             <TextInput 
-                                secureTextEntry={true} 
                                 value={ifstudent} 
                                 onChangeText={setifstudent} 
                                 placeholder="Student or Staff?" 
