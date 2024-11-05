@@ -5,8 +5,8 @@ import { getDocs, collection, doc, deleteDoc, updateDoc } from "firebase/firesto
 import { db } from './Firebase'; 
 
 const AdminLogin = () => {
-    const Login = () => {
-        router.push('/Login');
+    const Plan = () => {
+        router.push('/Plan');
     }
 
 
@@ -122,30 +122,35 @@ const AdminLogin = () => {
                         <Text style={styles.editTitle}>Edit Student</Text>
                         <TextInput
                             placeholder="Name"
+                            placeholderTextColor='black'
                             value={formData.name}
                             onChangeText={(text) => setFormData({ ...formData, name: text })}
                             style={styles.input}
                         />
                         <TextInput
                             placeholder="Student ID"
+                            placeholderTextColor='black'
                             value={formData.studentNumber}
                             onChangeText={(text) => setFormData({ ...formData, studentNumber: text })}
                             style={styles.input}
                         />
                         <TextInput
                             placeholder="Course"
+                            placeholderTextColor='black'
                             value={formData.course}
                             onChangeText={(text) => setFormData({ ...formData, course: text })}
                             style={styles.input}
                         />
                         <TextInput
                             placeholder="Year"
+                            placeholderTextColor='black'
                             value={formData.year}
                             onChangeText={(text) => setFormData({ ...formData, year: text })}
                             style={styles.input}
                         />
                         <TextInput
                             placeholder="Email"
+                            placeholderTextColor='black'
                             value={formData.email}
                             onChangeText={(text) => setFormData({ ...formData, email: text })}
                             style={styles.input}
@@ -157,7 +162,7 @@ const AdminLogin = () => {
                 )}
                 
                 <Animated.View style={[styles.button, { opacity: fadeAnim }]}>
-                    <TouchableOpacity onPress={Login}>
+                    <TouchableOpacity onPress={Plan}>
                         <Text style={styles.buttonText}>Return To Home</Text>
                     </TouchableOpacity>
                 </Animated.View>
@@ -243,7 +248,7 @@ const styles = StyleSheet.create({
         height: 50,
         width: 200,
         borderRadius: 22,
-        marginTop: 50,
+        marginBottom: '10%',
         marginLeft: '25%',
     },
 });

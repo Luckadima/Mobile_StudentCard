@@ -143,6 +143,10 @@ const seconds = timeSpentOnApp % 60;
     router.push('/Plan')
   }
 
+  const About = () => {
+    router.push('/About')
+  }
+
 
 
   const Activity = () => {
@@ -327,12 +331,8 @@ const handleLogout = () => {
         >
           <Entypo style={{ marginBottom: hp(-7) }} name="bar-graph" size={24} color="white" />
           <Text onPress={Activity} style={styles.sidebarText}>Your activity</Text>
-          <AntDesign style={{ marginBottom: hp(-7) }} name="setting" size={24} color="white" />
-          <Text style={styles.sidebarText}>Settings</Text>
-          <AntDesign style={{ marginBottom: hp(-7) }} name="profile" size={24} color="white" />
-          <Text style={styles.sidebarText}>Account</Text>
           <AntDesign style={{ marginBottom: hp(-7) }} name="question" size={24} color="white" />
-          <Text style={styles.sidebarText}>About</Text>
+          <Text onPress={About} style={styles.sidebarText}>About</Text>
           <AntDesign style={{ marginBottom: hp(-7) }} name="logout" size={24} color="white" />
           <Text onPress={handleLogout} style={styles.sidebarText}>Logout</Text>
         </Animated.View>

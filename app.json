@@ -3,12 +3,12 @@
     "name": "VirtualCard",
     "slug": "VirtualCard",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
     "userInterfaceStyle": "automatic",
     "splash": {
-      "image": "./assets/images/orangesplash.jpg",
+      "image": "./assets/images/virtualdoors.webp",
       "resizeMode": "cover",
       "backgroundColor": "#000"
     },

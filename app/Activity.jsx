@@ -44,9 +44,9 @@ export default function Activity() {
             const userDoc = await getDoc(doc(db, "users", uid)); // Get user document from Firestore
             if (userDoc.exists()) {
                 const data = userDoc.data();
-                setScan(data.scanCount || "no data sent");
+                setScan(data.scanCount || 0);
                 setTimeSpentOnApp(data.timeSpentOnApp || 0); // Ensure it's a number
-                setTaps(data.tapCount || 'no data sent')
+                setTaps(data.tapCount || 0)
             } else {
                 console.log("No such document!");
             }
@@ -73,12 +73,14 @@ export default function Activity() {
                 console.log("Image URI: ", uri); // Log the captured image URI
 
                 // Use documentDirectory which is writable
-                const fileUri = `${FileSystem.documentDirectory}activity_detail.jpg`; // Safe writable directory on iOS
+                const fileUri = `${FileSystem.documentDirectory}activity_detail.jpg`;
 
                 await FileSystem.copyAsync({
                     from: uri,
                     to: fileUri,
                 });
+
+
 
                 // Ensure the file exists and is accessible before sharing
                 const fileInfo = await FileSystem.getInfoAsync(fileUri);
@@ -88,6 +90,14 @@ export default function Activity() {
                 } else {
                     console.error('File does not exist at the provided URI');
                 }
+
+                const asset = await MediaLibrary.createAssetAsync(fileUri);
+                if (asset) {
+                    alert('Image saved successfully!'); 
+                } else {
+                    alert('Image could not be saved.');
+                }
+                
             } catch (error) {
                 console.error("Error capturing view: ", error);
             }

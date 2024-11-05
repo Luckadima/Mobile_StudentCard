@@ -36,6 +36,12 @@ function Login() {
     // const [errorMessage, setErrorMessage] = useState('');
     const [ifstudent , setifstudent] = useState('');
 
+        //This handles errors
+        const [emailError, setEmailError] = useState('');
+        const [passwordError, setPasswordError] = useState('');
+        const [studentNumberError, setStudentNumberError] = useState('');
+        const [ifstudentError, setIfstudentError] = useState('');
+
     // Toggle password visibility
     const toggleShowPassword = () => {
         setShowPassword(!showPassword);
@@ -86,14 +92,48 @@ function Login() {
     };
     
     
-    
-    
-    
-    
-    
-    
 
     const Signup = async () => {
+        let valid = true;
+    
+        // Email validation
+        // const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        // if (!emailPattern.test(email)) {
+        //     setEmailError('Email must be a valid Gmail address.');
+        //     valid = false;
+        // } else {
+        //     setEmailError('');
+        // }
+    
+        // Password validation
+        const passwordPattern = /^(?=.*[0-9])(?=.{8,})/;
+        if (!passwordPattern.test(password)) {
+            setPasswordError('Password must be at least 8 characters long and contain at least one number.');
+            valid = false;
+        } else {
+            setPasswordError('');
+        }
+    
+        // Student number validation
+        const studentNumberPattern = /^\d{9}$/;
+        if (!studentNumberPattern.test(studentnumber)) {
+            setStudentNumberError('Student number must be exactly 9 digits.');
+            valid = false;
+        } else {
+            setStudentNumberError('');
+        }
+    
+        // Ifstudent validation
+        if (!['Student', 'Staff'].includes(ifstudent)) {
+            setIfstudentError("Please enter either 'Student' or 'Staff' with the first letter capitalized.");
+            valid = false;
+        } else {
+            setIfstudentError('');
+        }
+    
+        if (!valid) return; 
+
+
         try {
             const response = await createUserWithEmailAndPassword(firebase_auth, email, password);
             const userId = response.user.uid;
@@ -151,32 +191,36 @@ function Login() {
                             />
                             <TextInput 
                                 value={studentnumber} 
-                                onChangeText={setstudentnumber} 
+                                onChangeText={(text) => { setstudentnumber(text); setStudentNumberError(''); }}  
                                 placeholder="Student Number" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {studentNumberError ? <Text style={styles.errorText}>{studentNumberError}</Text> : null}
                             <TextInput 
                                 value={email} 
-                                onChangeText={setemail} 
+                                onChangeText={(text) => { setemail(text); setEmailError(''); }} 
                                 placeholder="Email" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
                             <TextInput 
                                 value={password} 
-                                onChangeText={setpassword} 
+                                onChangeText={(text) => { setpassword(text); setPasswordError(''); }} 
                                 placeholder="Password" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
                             <TextInput 
                                 value={ifstudent} 
-                                onChangeText={setifstudent} 
+                                onChangeText={(text) => { setifstudent(text); setIfstudentError(''); }} 
                                 placeholder="Student or Staff?" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {ifstudentError ? <Text style={styles.errorText}>{ifstudentError}</Text> : null}
                             <Button title="Save" onPress={Signup} />
                         </View>
                     </PanGestureHandler>

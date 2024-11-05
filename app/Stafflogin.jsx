@@ -30,11 +30,20 @@ function Stafflogin() {
 
     // Modal and error handling
     const [modalVisible, setModalVisible] = useState(false);
-    const [newmodalVisible, newsetmodalVisible] = useState(false);
+
     const [adname, setadname] = useState('');
     const [adpassword, setadpassword] = useState('');
     const [errorMessage, setErrorMessage] = useState('');
     const [ifstudent , setifstudent] = useState('');
+
+    //This handles errors
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [studentNumberError, setStudentNumberError] = useState('');
+    const [ifstudentError, setIfstudentError] = useState('');
+
+    //admin login
+    const [newmodalVisible, newsetmodalVisible] = useState(false);
 
     // Toggle password visibility
     const toggleShowPassword = () => {
@@ -93,20 +102,59 @@ function Stafflogin() {
     
 
     const Signup = async () => {
+        let valid = true;
+    
+        // Email validation
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@gmail\.com$/;
+        if (!emailPattern.test(email)) {
+            setEmailError('Email must be a valid Gmail address.');
+            valid = false;
+        } else {
+            setEmailError('');
+        }
+    
+        // Password validation
+        const passwordPattern = /^(?=.*[0-9])(?=.{8,})/;
+        if (!passwordPattern.test(password)) {
+            setPasswordError('Password must be at least 8 characters long and contain at least one number.');
+            valid = false;
+        } else {
+            setPasswordError('');
+        }
+    
+        // Student number validation
+        const studentNumberPattern = /^\d{9}$/;
+        if (!studentNumberPattern.test(studentnumber)) {
+            setStudentNumberError('Student number must be exactly 9 digits.');
+            valid = false;
+        } else {
+            setStudentNumberError('');
+        }
+    
+        // Ifstudent validation
+        if (!['Student', 'Staff'].includes(ifstudent)) {
+            setIfstudentError("Please enter either 'Student' or 'Staff' with the first letter capitalized.");
+            valid = false;
+        } else {
+            setIfstudentError('');
+        }
+    
+        if (!valid) return; // Stop execution if any validation fails
+    
         try {
             const response = await createUserWithEmailAndPassword(firebase_auth, email, password);
             const userId = response.user.uid;
-
+    
             await setDoc(doc(db, "users", userId), {
                 name: name,
                 studentNumber: studentnumber,
                 email: email,
-                ifstudent:ifstudent
+                ifstudent: ifstudent
             });
-
+    
             handlesend();
             setModalVisible(false);
-            router.push('./Login');
+            router.push('./Stafflogin');
         } catch (error) {
             console.log(error);
             alert('Sign-up failed: ' + error.message);
@@ -114,13 +162,15 @@ function Stafflogin() {
     };
 
     const Admins = () => {
-        if (adname.toLowerCase() !== 'admin' || adpassword !== 'admin') {
+        if (adname !== 'Admin' || adpassword !== 'Admin') {
             setErrorMessage('Invalid admin credentials. Please try again.');
         } else {
             setadname('');
             setadpassword('');
             setErrorMessage('');
+            newsetmodalVisible(false);
             router.push('/AdminLogin');
+            
         }
     };
 
@@ -148,32 +198,36 @@ function Stafflogin() {
                             />
                             <TextInput 
                                 value={studentnumber} 
-                                onChangeText={setstudentnumber} 
-                                placeholder="Student Number" 
+                                onChangeText={(text) => { setstudentnumber(text); setStudentNumberError(''); }} 
+                                placeholder="Student Number or Staff Number" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {studentNumberError ? <Text style={styles.errorText}>{studentNumberError}</Text> : null}
                             <TextInput 
                                 value={email} 
-                                onChangeText={setemail} 
+                                onChangeText={(text) => { setemail(text); setEmailError(''); }}  
                                 placeholder="Email" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {emailError ? <Text style={styles.errorText}>{emailError}</Text> : null}
                             <TextInput 
                                 value={password} 
-                                onChangeText={setpassword} 
+                                onChangeText={(text) => { setpassword(text); setPasswordError(''); }} 
                                 placeholder="Password" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {passwordError ? <Text style={styles.errorText}>{passwordError}</Text> : null}
                             <TextInput 
                                 value={ifstudent} 
-                                onChangeText={setifstudent} 
+                                onChangeText={(text) => { setifstudent(text); setIfstudentError(''); }} 
                                 placeholder="Student or Staff?" 
                                 placeholderTextColor='black'
                                 style={styles.input}
                             />
+                            {ifstudentError ? <Text style={styles.errorText}>{ifstudentError}</Text> : null} 
                             <Button title="Save" onPress={Signup} />
                         </View>
                     </PanGestureHandler>
@@ -188,9 +242,8 @@ function Stafflogin() {
                 onRequestClose={() => newsetmodalVisible(false)}
             >
                 <GestureHandlerRootView style={styles.modalContainer}>
-                    <PanGestureHandler
-                        onEnded={() => newsetmodalVisible(false)}
-                    >
+                    <PanGestureHandler onEnded={() => newsetmodalVisible(false)} >
+
                         <View style={styles.modalView}>
                             <Text style={styles.modalTitle}>Enter Admin Info</Text>
                             <TextInput 

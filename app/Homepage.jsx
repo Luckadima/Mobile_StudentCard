@@ -19,6 +19,7 @@ export default function Homepage() {
     const [studentNumber, setStudentNumber] = useState("no data sent");
     const [timerCompleted, setTimerCompleted] = useState(false); // State to track 
     const [resetCount, setResetCount] = useState(0); // State to track the reset count
+    const [isScannerPressed, setIsScannerPressed] = useState(false);
 
 
     useEffect(() => {
@@ -160,29 +161,29 @@ export default function Homepage() {
     
 
     const [animationStatus, setAnimationStatus] = useState('scanning');
-
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setAnimationStatus('success'); 
-            setTimerCompleted(true); // Set timer completed to true
+        if (isScannerPressed) { 
+            const timer = setTimeout(() => {
+                setAnimationStatus('success'); 
+                setTimerCompleted(true); 
 
-            const resetTimer = setTimeout(async () => {
-                setResetCount((prevCount) => {
-                    const newCount = prevCount + 1;
-                    updateFirebaseTapCount(newCount); // Update tap count in Firebase
-                    Alert.alert('Access Granted');
-                    router.push('/Activity')
-                    // sendNotification(); // Send notification after the reset
-                    return newCount;
-                }); 
-                setAnimationStatus('scanning'); 
-            }, 4000); 
+                const resetTimer = setTimeout(async () => {
+                    setResetCount((prevCount) => {
+                        const newCount = prevCount + 1;
+                        updateFirebaseTapCount(newCount); 
+                        Alert.alert('Access Granted');
+                        router.push('/Activity');
+                        return newCount;
+                    }); 
+                    setAnimationStatus('scanning'); 
+                }, 4000); 
 
-            return () => clearTimeout(resetTimer); 
-        }, 50000); 
+                return () => clearTimeout(resetTimer); 
+            }, 5000); 
 
-        return () => clearTimeout(timer); 
-    }, []);
+            return () => clearTimeout(timer); 
+        }
+    }, [isScannerPressed]);
 
 
     const updateFirebaseTapCount = async () => {
@@ -240,8 +241,10 @@ export default function Homepage() {
                     </View>
                 </View>
             </SafeAreaView>
+            {/* <TouchableOpacity onPress={() => setIsScannerPressed(true)}> */}
 
-            <View style={styles.tapToEnterContainer}>
+            <View style={styles.tapToEnterContainer}> 
+            <TouchableOpacity onPress={() => setIsScannerPressed(true)}>
                 {animationStatus === 'scanning' && (
                     <LottieView
                     source={require('./Scannerios.json')} 
@@ -269,13 +272,15 @@ export default function Homepage() {
                         Timer reset count: {resetCount}
                     </Text>
                 )}
+            </TouchableOpacity>
+
 
 
 
             </View>
 
             <View style={styles.button}>
-                <TouchableOpacity onPress={handleReturnHome}>
+                <TouchableOpacity onPress={handleReturnHome} >
                     <Text style={styles.buttonText}>Return To Home</Text>
                 </TouchableOpacity>
             </View>

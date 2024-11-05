@@ -9,9 +9,7 @@ import { doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore me
 function QRcode() {
     const [hasPermission, setHasPermission] = useState(null);
     const [scanned, setScanned] = useState(false);
-    const [cooldown, setCooldown] = useState(0); // Timer state for cooldown
     const [scanCount, setScanCount] = useState(0); // Counter state for scans
-    const cooldownDuration = 5; // Cooldown duration in seconds
   
     useEffect(() => {
         const getCameraPermissions = async () => {
@@ -22,49 +20,27 @@ function QRcode() {
         getCameraPermissions();
     }, []);
 
-    // Countdown timer for scanner
-    useEffect(() => {
-        let interval;
-        if (scanned && cooldown > 0) {
-            interval = setInterval(() => {
-                setCooldown((prevCooldown) => prevCooldown - 1);
-            }, 1000);
-        } else if (cooldown === 0 && scanned) {
-            setScanned(false); // Re-enable scanning after cooldown
-        }
-
-        return () => clearInterval(interval); // Clear interval on unmount
-    }, [scanned, cooldown]);
-
-    // Reset cooldown and scanned state when screen comes into focus
-    useFocusEffect(
-        React.useCallback(() => {
-            if (cooldown > 0) {
-                setScanned(true); // Ensure scanned is true if there's an active cooldown
-            }
-        }, [cooldown])
-    );
 
     const handleBarcodeScanned = async ({ type, data }) => {
-        setScanned(true);
-        setCooldown(cooldownDuration); // Start cooldown
-        setScanCount(prevCount => prevCount + 1); // Increment the scan counter
+        if (scanned) return; // Prevent handling multiple times during the cooldown
     
-        // Display "Access Granted" alert instead of showing scanned data
+        setScanned(true);
+        setScanCount(prevCount => prevCount + 1); // Increment the scan counter
+      
+        // Display "Access Granted" alert
         alert("Access granted");
     
-        const userId = firebase_auth.currentUser?.uid; // Dynamically get the current user's UID
+        const userId = firebase_auth.currentUser?.uid;
         if (userId) {
             try {
                 const userRef = doc(db, 'users', userId);
-                const userDoc = await getDoc(userRef); // Retrieve the document for the user
+                const userDoc = await getDoc(userRef);
     
-                let currentCount = 0; // Default to 0 if no existing document
+                let currentCount = 0;
                 if (userDoc.exists()) {
-                    currentCount = userDoc.data().scanCount || 0; // Get current scan count or default to 0
+                    currentCount = userDoc.data().scanCount || 0;
                 }
     
-                // Update the scan count in Firestore
                 await setDoc(userRef, { scanCount: currentCount + 1 }, { merge: true });
                 console.log("Scan count updated successfully");
     
@@ -79,6 +55,7 @@ function QRcode() {
             console.error("User not authenticated");
         }
     };
+    
     
   
 
@@ -127,10 +104,6 @@ function QRcode() {
                         style={StyleSheet.absoluteFillObject}
                     />
                 </View>
-                
-                {scanned && cooldown > 0 && (
-                    <Text style={styles.cooldownText}>Please wait {cooldown} seconds to scan again</Text>
-                )}
 
                 {/* Display the number of times the scanner has been used */}
                 <Text style={styles.scanCountText}>Number of scans: {scanCount}</Text>
